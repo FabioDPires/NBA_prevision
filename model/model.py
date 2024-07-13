@@ -1,12 +1,8 @@
 import streamlit as st
 import requests
-from nba_api.stats.endpoints import playercareerstats
-from nba_api.stats.static import teams
-from nba_api.live.nba.endpoints import scoreboard
 from collections import defaultdict
 from datetime import date
 from datetime import datetime
-from nba_api.stats.endpoints import leaguegamefinder
 import json
 
 SEASON_ID=2023
