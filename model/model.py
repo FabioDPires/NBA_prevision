@@ -199,7 +199,7 @@ if st.button("Get previsions"):
         for game in games:
             game = add_team_info(game,pd_teams)
             game = add_game_info(game,pd_games,season_id,selected_date)
-            st.write(f"{game['VISITOR_TEAM_NAME']} @ {game['HOME_TEAM_NAME']}")
+            st.write(f"{game['VISITOR_TEAM_NAME']} - {game['VISITOR_TEAM_TOTAL_GAMES']} @ {game['HOME_TEAM_NAME']}")
     else:
         st.write("No games found for the chosen date")
 
