@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 import pandas as pd
 import os
+from env import LOCAL_DATA_DIRECTORY, STREAMLIT_DATA_DIRECTORY
 
 SEASON_ID=2023
 
@@ -178,9 +179,10 @@ def add_game_info(game, pd_games, season_id, selected_date):
     return game
 
 
-
-pd_teams = pd.read_excel('/mount/src/nba_prevision/model/data/nba_teams.xlsx')
-pd_games = pd.read_excel('/mount/src/nba_prevision/model/data/games.xlsx')
+nba_teams_file_path = os.path.join(STREAMLIT_DATA_DIRECTORY, 'nba_teams.xlsx')
+games_file_path = os.path.join(STREAMLIT_DATA_DIRECTORY, 'games.xlsx')
+pd_teams = pd.read_excel(nba_teams_file_path)
+pd_games = pd.read_excel(games_file_path)
 
 
 
@@ -199,7 +201,7 @@ if st.button("Get previsions"):
         for game in games:
             game = add_team_info(game,pd_teams)
             game = add_game_info(game,pd_games,season_id,selected_date)
-            st.write(f"{game['VISITOR_TEAM_NAME']} - {game['VISITOR_TEAM_TOTAL_GAMES']} @ {game['HOME_TEAM_NAME']}")
+            st.write(f"{game['VISITOR_TEAM_NAME']} @ {game['HOME_TEAM_NAME']}")
     else:
         st.write("No games found for the chosen date")
 
