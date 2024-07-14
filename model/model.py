@@ -176,7 +176,9 @@ def add_game_info(game, pd_games, season_id, selected_date):
     game['AWAY_TEAM_WIN_PERCENTAGE_AWAY'] = visitor_stats_away
     return game
 
+st.write(os.getcwd())
 
+'''
 pd_teams = pd.read_excel('data/nba_teams.xlsx')
 pd_games = pd.read_excel('data/games.xlsx')
 
@@ -202,7 +204,7 @@ if st.button("Get previsions"):
         st.write("No games found for the chosen date")
 
 
-
+'''
 
 
 
