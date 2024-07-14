@@ -179,7 +179,7 @@ def add_game_info(game, pd_games, season_id, selected_date):
 
 
 
-pd_teams = pd.read_excel('/model/data/nba_teams.xlsx')
+pd_teams = pd.read_excel('/mount/src/nba_prevision/model/data/nba_teams.xlsx')
 pd_games = pd.read_excel('/model/data/games.xlsx')
 
 
