@@ -177,7 +177,17 @@ def add_game_info(game, pd_games, season_id, selected_date):
     game['AWAY_TEAM_WIN_PERCENTAGE_AWAY'] = visitor_stats_away
     return game
 
-st.write(os.getcwd())
+directory_path = '/mount/src/nba_prevision'
+
+# Verificando se o diretório existe
+if os.path.isdir(directory_path):
+    st.write(f"Contents of the directory {directory_path}:")
+    # Listando o conteúdo do diretório
+    directory_contents = os.listdir(directory_path)
+    for item in directory_contents:
+        st.write(item)
+else:
+    st.write(f"The directory {directory_path} does not exist.")
 
 '''
 pd_teams = pd.read_excel('data/nba_teams.xlsx')
