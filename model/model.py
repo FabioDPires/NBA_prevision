@@ -154,6 +154,67 @@ def calculate_team_stats_away(team_id,pd_games,season_id,selected_date):
     win_percentage_away = round(away_wins / away_games if away_games > 0 else 0.0, 3)
     return win_percentage_away
 
+def calculate_team_stats_last_games(team_id,pd_games,season_id,selected_date,num_games):
+    team_games = pd_games[(pd_games['SEASON'] == season_id) & (pd_games['GAME_DATE_EST'] < selected_date) & 
+                    ((pd_games['HOME_TEAM_ID'] == team_id) | (pd_games['VISITOR_TEAM_ID'] == team_id))]
+    team_games = team_games.sort_values(by='GAME_DATE_EST', ascending=True)
+
+    num_available_games = len(team_games)
+    
+    if num_available_games == 0:
+        avg_points = 0
+        avg_conceded = 0
+        avg_assists = 0
+        avg_fgpct=0
+        avg_ftpct = 0
+        avg_fg3pct = 0
+        avg_reb = 0
+
+    else:
+        relevant_games = team_games.tail(min(num_games, num_available_games))
+        total_points = 0
+        total_conceded = 0
+        total_assists = 0
+        total_fgpct=0
+        total_ftpct = 0
+        total_fg3pct = 0
+        total_reb = 0
+        for i, g in relevant_games.iterrows():
+            if team_id == g['HOME_TEAM_ID']:
+                total_points += g['PTS_home']
+                total_conceded +=g['PTS_away']
+                total_assists += g['AST_home']
+                total_fgpct += g['FG_PCT_home']
+                total_ftpct += g['FT_PCT_home']
+                total_fg3pct += g['FG3_PCT_home']
+                total_reb += g['REB_home']
+            else:
+                total_points += g['PTS_away']
+                total_conceded += g['PTS_home']
+                total_assists += g['AST_away']
+                total_fgpct += g['FG_PCT_away']
+                total_ftpct += g['FT_PCT_away']
+                total_fg3pct += g['FG3_PCT_away']
+                total_reb += g['REB_away']  
+    
+        avg_points = total_points / len(relevant_games)
+        avg_conceded = total_conceded / len(relevant_games)
+        avg_assists = total_assists / len(relevant_games)
+        avg_fgpct = total_fgpct / len(relevant_games)
+        avg_ftpct = total_ftpct / len(relevant_games)
+        avg_fg3pct = total_fg3pct / len(relevant_games)
+        avg_reb = total_reb / len(relevant_games)
+        
+        avg_points = round(avg_points, 2)
+        avg_conceded = round(avg_conceded, 2)
+        avg_assists = round(avg_assists, 2)
+        avg_fgpct = round(avg_fgpct, 2)
+        avg_ftpct = round(avg_ftpct, 2)
+        avg_fg3pct = round(avg_fg3pct, 2)
+        avg_reb = round(avg_reb, 2)
+ 
+    return avg_points,avg_conceded,avg_assists,avg_fgpct,avg_ftpct,avg_fg3pct,avg_reb
+
 
 def add_game_info(game, pd_games, season_id, selected_date):
     selected_date = pd.to_datetime(selected_date)
@@ -168,6 +229,8 @@ def add_game_info(game, pd_games, season_id, selected_date):
     home_stats_at_home=calculate_team_stats_at_home(home_team_id,pd_games,season_id,selected_date)
     game['HOME_TEAM_TOTAL_LOSSES_AT_HOME'], game['HOME_TEAM_WIN_PERCENTAGE_AT_HOME'],game['HOME_TEAM_WIN/LOSS_STREAK_AT_HOME'] = home_stats_at_home
 
+    home_stats_last_n_games=calculate_team_stats_last_games(home_team_id,pd_games,season_id,selected_date,5)
+    game['AVG_POINTS_LAST_5_GAMES_HOME_TEAM'],game['AVG_POINTS_CONCEDED_LAST_5_GAMES_HOME_TEAM'],game['AVG_ASSISTS_LAST_5_GAMES_HOME_TEAM'],game['AVG_FGPCT_LAST_5_GAMES_HOME_TEAM'],game['AVG_FTPCT_LAST_5_GAMES_HOME_TEAM'],game['AVG_FG3PCT_LAST_5_GAMES_HOME_TEAM'],game['AVG_REB_LAST_5_GAMES_HOME_TEAM'] = home_stats_last_n_games
 
     #AWAY TEAM
     visitor_team_id = game["VISITOR_TEAM_ID"]
@@ -176,11 +239,14 @@ def add_game_info(game, pd_games, season_id, selected_date):
 
     visitor_stats_away = calculate_team_stats_away(visitor_team_id,pd_games,season_id,selected_date)
     game['AWAY_TEAM_WIN_PERCENTAGE_AWAY'] = visitor_stats_away
+
+    away_stats_last_n_games=calculate_team_stats_last_games(visitor_team_id,pd_games,season_id,selected_date,5)
+    game['AVG_POINTS_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_POINTS_CONCEDED_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_ASSISTS_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_FGPCT_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_FTPCT_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_FG3PCT_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_REB_LAST_5_GAMES_VISITOR_TEAM'] = away_stats_last_n_games
     return game
 
 
-nba_teams_file_path = os.path.join(STREAMLIT_DATA_DIRECTORY, 'nba_teams.xlsx')
-games_file_path = os.path.join(STREAMLIT_DATA_DIRECTORY, 'games.xlsx')
+nba_teams_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'nba_teams.xlsx')
+games_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'games.xlsx')
 pd_teams = pd.read_excel(nba_teams_file_path)
 pd_games = pd.read_excel(games_file_path)
 
@@ -201,7 +267,7 @@ if st.button("Get previsions"):
         for game in games:
             game = add_team_info(game,pd_teams)
             game = add_game_info(game,pd_games,season_id,selected_date)
-            st.write(f"{game['VISITOR_TEAM_NAME']} @ {game['HOME_TEAM_NAME']}")
+            st.write(f"{game['VISITOR_TEAM_NAME']}  - {game['AVG_POINTS_CONCEDED_LAST_5_GAMES_VISITOR_TEAM']} @ {game['HOME_TEAM_NAME']}")
     else:
         st.write("No games found for the chosen date")
 
