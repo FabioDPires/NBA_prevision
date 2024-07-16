@@ -247,6 +247,42 @@ def calculate_team_stats_last_games_at_home(team_id,pd_games,season_id,selected_
 
     return avg_points,avg_conceded,avg_assists,avg_reb
  
+def calculate_team_stats_last_games_away(team_id,pd_games,season_id,selected_date,num_games):
+    team_games = pd_games[(pd_games['SEASON'] == season_id) & (pd_games['GAME_DATE_EST'] < selected_date) & 
+                    (pd_games['VISITOR_TEAM_ID'] == team_id)]
+    team_games = team_games.sort_values(by='GAME_DATE_EST', ascending=True)                
+    
+    num_available_games = len(team_games)
+    
+    if num_available_games == 0:
+        avg_points = 0
+        avg_conceded = 0
+        avg_assists = 0
+        avg_fg3pct = 0
+        avg_reb = 0
+
+    else:
+        relevant_games = team_games.tail(min(num_games, num_available_games))
+        total_points = relevant_games['PTS_away'].sum()
+        total_conceded = relevant_games['PTS_home'].sum()
+        total_assists = relevant_games['AST_away'].sum()
+        total_fg3pct = relevant_games['FG3_PCT_away'].sum()
+        total_reb = relevant_games['REB_away'].sum()
+
+        avg_points=total_points / len(relevant_games)
+        avg_conceded=total_conceded / len(relevant_games)
+        avg_assists=total_assists / len(relevant_games)
+        avg_fg3pct=total_fg3pct / len(relevant_games)
+        avg_reb=total_reb / len(relevant_games)
+
+        avg_points = round(avg_points, 2)
+        avg_conceded = round(avg_conceded, 2)
+        avg_assists = round(avg_assists, 2)
+        avg_fg3pct = round(avg_fg3pct, 2)
+        avg_reb = round(avg_reb, 2)
+
+    return avg_points,avg_conceded,avg_assists,avg_fg3pct,avg_reb
+
 
 def add_game_info(game, pd_games, season_id, selected_date):
     selected_date = pd.to_datetime(selected_date)
@@ -277,6 +313,10 @@ def add_game_info(game, pd_games, season_id, selected_date):
 
     away_stats_last_n_games=calculate_team_stats_last_games(visitor_team_id,pd_games,season_id,selected_date,5)
     game['AVG_POINTS_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_POINTS_CONCEDED_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_ASSISTS_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_FGPCT_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_FTPCT_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_FG3PCT_LAST_5_GAMES_VISITOR_TEAM'],game['AVG_REB_LAST_5_GAMES_VISITOR_TEAM'] = away_stats_last_n_games
+    
+    away_stats_last_n_games_away=calculate_team_stats_last_games_away(visitor_team_id,pd_games,season_id,selected_date,5)
+    game['AVG_POINTS_LAST_5_GAMES_AWAY_VISITOR_TEAM'],game['AVG_POINTS_CONCEDED_LAST_5_GAMES_AWAY_VISITOR_TEAM'],game['AVG_ASSISTS_LAST_5_GAMES_AWAY_VISITOR_TEAM'],game['AVG_FG3PCT_LAST_5_GAMES_AWAY_VISITOR_TEAM'],game['AVG_REB_LAST_5_GAMES_AWAY_VISITOR_TEAM'] = away_stats_last_n_games_away
+    
     return game
 
 
@@ -302,7 +342,7 @@ if st.button("Get previsions"):
         for game in games:
             game = add_team_info(game,pd_teams)
             game = add_game_info(game,pd_games,season_id,selected_date)
-            st.write(f"{game['VISITOR_TEAM_NAME']} @ {game['HOME_TEAM_NAME']}- {game['AVG_POINTS_CONCEDED_LAST_5_GAMES_AT_HOME_HOME_TEAM']}")
+            st.write(f"{game['VISITOR_TEAM_NAME']} - {game['AVG_POINTS_CONCEDED_LAST_5_GAMES_AWAY_VISITOR_TEAM']} @ {game['HOME_TEAM_NAME']}")
     else:
         st.write("No games found for the chosen date")
 
