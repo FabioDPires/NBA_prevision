@@ -283,8 +283,65 @@ def calculate_team_stats_last_games_away(team_id,pd_games,season_id,selected_dat
 
     return avg_points,avg_conceded,avg_assists,avg_fg3pct,avg_reb
 
+def calculate_players_usage(team_id,pd_games,pd_players,season_id,selected_date,num_games):
+    team_games = pd_games[(pd_games['SEASON'] == season_id) & (pd_games['GAME_DATE_EST'] < selected_date) & 
+                    ((pd_games['HOME_TEAM_ID'] == team_id) | (pd_games['VISITOR_TEAM_ID'] == team_id))]
+    team_games = team_games.sort_values(by='GAME_DATE_EST', ascending=True)  
 
-def add_game_info(game, pd_games, season_id, selected_date):
+    num_available_games = len(team_games)
+    
+    if num_available_games == 0:
+        avg_minutes = 0.0     
+    else:
+        tmp = pd.merge(team_games, pd_players, left_on=['GAME_ID', 'HOME_TEAM_ID'], right_on=['gameId', 'teamId'])
+        home_team_total_minutes = tmp.groupby(['GAME_ID', 'HOME_TEAM_ID'])['minutes'].sum().reset_index(name='HOME_TEAM_TOTAL_MINUTES')
+        team_games = pd.merge(team_games, home_team_total_minutes, on=['GAME_ID', 'HOME_TEAM_ID'], how='left')
+        
+        tmp = pd.merge(team_games, pd_players, left_on=['GAME_ID', 'VISITOR_TEAM_ID'], right_on=['gameId', 'teamId'])
+        away_team_total_minutes = tmp.groupby(['GAME_ID', 'VISITOR_TEAM_ID'])['minutes'].sum().reset_index(name='VISITOR_TEAM_TOTAL_MINUTES')
+        team_games = pd.merge(team_games, away_team_total_minutes, on=['GAME_ID', 'VISITOR_TEAM_ID'], how='left')
+
+        tmp = pd.merge(team_games, pd_players, left_on=['GAME_ID', 'HOME_TEAM_ID'], right_on=['gameId', 'teamId'])
+        home_team_count = tmp.groupby(['GAME_ID', 'HOME_TEAM_ID']).size().reset_index(name='HOME_TEAM_USED_PLAYERS')
+        team_games = pd.merge(team_games, home_team_count, on=['GAME_ID', 'HOME_TEAM_ID'], how='left')
+
+        tmp = pd.merge(team_games, pd_players, left_on=['GAME_ID', 'VISITOR_TEAM_ID'], right_on=['gameId', 'teamId'])
+        away_team_count = tmp.groupby(['GAME_ID', 'VISITOR_TEAM_ID']).size().reset_index(name='VISITOR_TEAM_USED_PLAYERS')
+        team_games = pd.merge(team_games, away_team_count, on=['GAME_ID', 'VISITOR_TEAM_ID'], how='left')
+        
+        team_games['HOME_TEAM_TOTAL_MINUTES'] = pd.to_numeric(team_games['HOME_TEAM_TOTAL_MINUTES'], errors='coerce')
+        team_games['VISITOR_TEAM_TOTAL_MINUTES'] = pd.to_numeric(team_games['VISITOR_TEAM_TOTAL_MINUTES'], errors='coerce')
+
+        team_games['HOME_TEAM_AVG_MINUTES'] = team_games['HOME_TEAM_TOTAL_MINUTES'] / team_games['HOME_TEAM_USED_PLAYERS']
+        team_games['HOME_TEAM_AVG_MINUTES'] = team_games['HOME_TEAM_AVG_MINUTES'].round(2)
+
+        team_games['VISITOR_TEAM_AVG_MINUTES'] = team_games['VISITOR_TEAM_TOTAL_MINUTES'] / team_games['VISITOR_TEAM_USED_PLAYERS']
+        team_games['VISITOR_TEAM_AVG_MINUTES'] = team_games['VISITOR_TEAM_AVG_MINUTES'].round(2)
+
+        relevant_games = team_games.tail(min(num_games, num_available_games))
+        
+        total = 0
+        st.write("JOGOS RELEVANTES:", len(relevant_games))
+        for index, g in relevant_games.iterrows():
+
+            if team_id == g['HOME_TEAM_ID']:
+                st.write("JOGADORES USADOS:" , g['HOME_TEAM_USED_PLAYERS'])
+                st.write("MINUTOS TOTAIS:",g['HOME_TEAM_TOTAL_MINUTES'])
+                st.write("MEDIA:",g['HOME_TEAM_AVG_MINUTES'])
+                total += g['HOME_TEAM_AVG_MINUTES']
+            else:
+                #total += g['VISITOR_TEAM_AVG_MINUTES']
+                st.write("JOGADORES USADOS:" , g['VISITOR_TEAM_USED_PLAYERS'])
+                st.write("MINUTOS TOTAIS:",g['VISITOR_TEAM_TOTAL_MINUTES'])
+                st.write("MEDIA:",g['VISITOR_TEAM_AVG_MINUTES'])
+                total += g['VISITOR_TEAM_AVG_MINUTES']
+    
+        avg_minutes = total/len(relevant_games)
+        avg_minutes = round(avg_minutes, 2)
+
+    return avg_minutes
+
+def add_game_info(game, pd_games,pd_players, season_id, selected_date):
     selected_date = pd.to_datetime(selected_date)
     pd_games['GAME_DATE_EST'] = pd.to_datetime(pd_games['GAME_DATE_EST'])
     pd_games_sorted = pd_games.sort_values(by='GAME_DATE_EST')
@@ -303,6 +360,11 @@ def add_game_info(game, pd_games, season_id, selected_date):
     home_stats_last_n_games_at_home=calculate_team_stats_last_games_at_home(home_team_id,pd_games,season_id,selected_date,5)
     game['AVG_POINTS_LAST_5_GAMES_AT_HOME_HOME_TEAM'],game['AVG_POINTS_CONCEDED_LAST_5_GAMES_AT_HOME_HOME_TEAM'],game['AVG_ASSISTS_LAST_5_GAMES_AT_HOME_HOME_TEAM'],game['AVG_REB_LAST_5_GAMES_AT_HOME_HOME_TEAM'] = home_stats_last_n_games_at_home
     
+    #home_players_used=calculate_players_usage(home_team_id,pd_games,pd_players,season_id,selected_date,4)
+    #game['AVG_MINUTES_LAST_4_GAMES_HOME_TEAM'] = home_players_used
+    
+    
+    
     #AWAY TEAM
     visitor_team_id = game["VISITOR_TEAM_ID"]
     visitor_stats = calculate_team_stats(visitor_team_id, pd_games, season_id, selected_date)
@@ -317,13 +379,20 @@ def add_game_info(game, pd_games, season_id, selected_date):
     away_stats_last_n_games_away=calculate_team_stats_last_games_away(visitor_team_id,pd_games,season_id,selected_date,5)
     game['AVG_POINTS_LAST_5_GAMES_AWAY_VISITOR_TEAM'],game['AVG_POINTS_CONCEDED_LAST_5_GAMES_AWAY_VISITOR_TEAM'],game['AVG_ASSISTS_LAST_5_GAMES_AWAY_VISITOR_TEAM'],game['AVG_FG3PCT_LAST_5_GAMES_AWAY_VISITOR_TEAM'],game['AVG_REB_LAST_5_GAMES_AWAY_VISITOR_TEAM'] = away_stats_last_n_games_away
     
+    away_players_used=calculate_players_usage(visitor_team_id,pd_games,pd_players,season_id,selected_date,4)
+    game['AVG_MINUTES_LAST_4_GAMES_VISITOR_TEAM'] = away_players_used
+
+
+
     return game
 
 
 nba_teams_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'nba_teams.xlsx')
 games_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'games.xlsx')
+players_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'players.xlsx')
 pd_teams = pd.read_excel(nba_teams_file_path)
 pd_games = pd.read_excel(games_file_path)
+pd_players = pd.read_excel(players_file_path)
 
 
 
@@ -341,8 +410,8 @@ if st.button("Get previsions"):
     if games:
         for game in games:
             game = add_team_info(game,pd_teams)
-            game = add_game_info(game,pd_games,season_id,selected_date)
-            st.write(f"{game['VISITOR_TEAM_NAME']} - {game['AVG_POINTS_CONCEDED_LAST_5_GAMES_AWAY_VISITOR_TEAM']} @ {game['HOME_TEAM_NAME']}")
+            game = add_game_info(game,pd_games,pd_players,season_id,selected_date)
+            st.write(f"{game['VISITOR_TEAM_NAME']} - {game['AVG_MINUTES_LAST_4_GAMES_VISITOR_TEAM']}  @ {game['HOME_TEAM_NAME']} ")
     else:
         st.write("No games found for the chosen date")
 
