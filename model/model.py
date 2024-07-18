@@ -526,7 +526,7 @@ pd_players = pd.read_excel(players_file_path)
 
 model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
 
-target_directory = '/mount/src/nba_prevision/model'
+target_directory = '/mount/src/nba_prevision/model/prevision_model.pkl '
 
 # Mostrar o caminho do diretório alvo
 st.write(f"O caminho do diretório alvo é: {target_directory}")
@@ -541,7 +541,7 @@ for entry in entries:
         st.write(f"📄 {entry} (Arquivo)")
 
 
-model = joblib.load(model_path)
+model = joblib.load(target_directory)
 
 
 title_style = """
