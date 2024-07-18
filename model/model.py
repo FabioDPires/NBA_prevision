@@ -525,6 +525,20 @@ pd_games = pd.read_excel(games_file_path)
 pd_players = pd.read_excel(players_file_path)
 
 model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
+
+current_path = os.getcwd()
+st.write(f"O caminho atual é: {current_path}")
+
+# Listar arquivos no diretório atual
+files_in_directory = os.listdir(current_path)
+st.write("Arquivos no diretório atual:")
+st.write(files_in_directory)
+
+# Verificar se um arquivo específico existe
+file_to_check = 'nome_do_arquivo.pkl'
+file_exists = os.path.isfile(file_to_check)
+st.write(f"Arquivo '{file_to_check}' existe: {file_exists}")
+
 model = joblib.load(model_path)
 
 
