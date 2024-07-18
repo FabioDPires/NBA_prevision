@@ -526,7 +526,7 @@ pd_players = pd.read_excel(players_file_path)
 
 model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
 
-# Caminho do arquivo a ser verificado
+# Caminho do arquivo do modelo
 target_file = '/mount/src/nba_prevision/model/prevision_model.pkl'
 
 # Mostrar o caminho do arquivo alvo
@@ -537,6 +537,13 @@ if os.path.isfile(target_file):
     st.write(f"O arquivo '{target_file}' existe ---.")
 else:
     st.write(f"O arquivo '{target_file}' não foi encontrado.")
+
+# Tentar carregar o modelo e capturar o erro
+try:
+    model = joblib.load(target_file)
+    st.write("Modelo carregado com sucesso!")
+except Exception as e:
+    st.write(f"Erro ao carregar o modelo: {e}")
 
 
 model = joblib.load(target_file)
