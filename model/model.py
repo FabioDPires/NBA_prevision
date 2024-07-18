@@ -534,12 +534,12 @@ st.write(f"O caminho do arquivo alvo é: {target_file}")
 
 # Verificar se o arquivo existe
 if os.path.isfile(target_file):
-    st.write(f"O arquivo '{target_file}' existe.")
+    st.write(f"O arquivo '{target_file}' existe ---.")
 else:
     st.write(f"O arquivo '{target_file}' não foi encontrado.")
 
 
-model = joblib.load(target_directory)
+model = joblib.load(target_file)
 
 
 title_style = """
