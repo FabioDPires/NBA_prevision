@@ -571,7 +571,34 @@ selected_date = st.date_input("Choose the day you want previsions for", date.tod
 formatted_date = selected_date.strftime("%m/%d/%Y")
 
 season_id = get_nba_season_id(selected_date)
+# Define o estilo CSS para o botão
+button_style = """
+    <style>
+        .center-button {
+            display: flex;
+            justify-content: center; /* Centraliza horizontalmente */
+            margin-top: 20px; /* Espaçamento superior */
+        }
+        .center-button button {
+            font-size: 20px !important; /* Aumenta o tamanho do texto */
+            padding: 10px 20px !important; /* Aumenta o padding do botão */
+        }
+    </style>
+"""
 
+# Insere o estilo CSS no Markdown
+st.markdown(button_style, unsafe_allow_html=True)
+
+# Adiciona o botão dentro de uma div centralizada usando HTML
+st.markdown("""
+    <div class="center-button">
+        """ + st.button("Get previsions", key="unique_button_key") + """
+    </div>
+""", unsafe_allow_html=True)
+
+# Lógica para quando o botão é clicado
+if st.session_state.unique_button_key:
+    st.write("Button clicked!")
 if st.button("Get previsions"):
     try:
         games = get_schedule(formatted_date,season_id)
