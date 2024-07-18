@@ -524,8 +524,8 @@ pd_teams = pd.read_excel(nba_teams_file_path)
 pd_games = pd.read_excel(games_file_path)
 pd_players = pd.read_excel(players_file_path)
 
-
-st.write(os.getcwd())
+model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
+model = joblib.load(model_path)
 
 
 title_style = """
