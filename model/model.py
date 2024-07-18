@@ -589,7 +589,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 
 # Adiciona o botão na coluna do meio
 with col2:
-    if st.button("Get previsions"):
+    if st.button("Predict"):
         st.write("Button clicked!")
 
 
