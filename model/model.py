@@ -526,7 +526,7 @@ pd_players = pd.read_excel(players_file_path)
 
 model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
 st.write(model_path)
-#model = joblib.load(model_path)
+model = joblib.load(model_path)
 
 
 title_style = """
