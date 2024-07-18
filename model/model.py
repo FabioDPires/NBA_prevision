@@ -526,19 +526,17 @@ pd_players = pd.read_excel(players_file_path)
 
 model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
 
-target_directory = '/mount/src/nba_prevision/model/prevision_model.pkl '
+# Caminho do arquivo a ser verificado
+target_file = '/mount/src/nba_prevision/model/prevision_model.pkl'
 
-# Mostrar o caminho do diretório alvo
-st.write(f"O caminho do diretório alvo é: {target_directory}")
+# Mostrar o caminho do arquivo alvo
+st.write(f"O caminho do arquivo alvo é: {target_file}")
 
-entries = os.listdir(target_directory)
-st.write(f"Conteúdo do diretório '{target_directory}':")
-for entry in entries:
-    full_path = os.path.join(target_directory, entry)
-    if os.path.isdir(full_path):
-        st.write(f"📁 {entry} (Pasta)")
-    else:
-        st.write(f"📄 {entry} (Arquivo)")
+# Verificar se o arquivo existe
+if os.path.isfile(target_file):
+    st.write(f"O arquivo '{target_file}' existe.")
+else:
+    st.write(f"O arquivo '{target_file}' não foi encontrado.")
 
 
 model = joblib.load(target_directory)
