@@ -517,9 +517,9 @@ def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, ho
 
 
 
-nba_teams_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'nba_teams.xlsx')
-games_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'games.xlsx')
-players_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'players.xlsx')
+nba_teams_file_path = os.path.join(STREAMLIT_DATA_DIRECTORY, 'nba_teams.xlsx')
+games_file_path = os.path.join(STREAMLIT_DATA_DIRECTORY, 'games.xlsx')
+players_file_path = os.path.join(STREAMLIT_DATA_DIRECTORY, 'players.xlsx')
 pd_teams = pd.read_excel(nba_teams_file_path)
 pd_games = pd.read_excel(games_file_path)
 pd_players = pd.read_excel(players_file_path)
