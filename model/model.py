@@ -6,7 +6,8 @@ from datetime import datetime
 import json
 import pandas as pd
 import os
-from env import LOCAL_DATA_DIRECTORY, STREAMLIT_DATA_DIRECTORY,LOCAL_MODEL_DIRECTORY,STREAMLIT_MODEL_DIRECTORY
+from env import LOCAL_DATA_DIRECTORY, STREAMLIT_DATA_DIRECTORY,LOCAL_MODEL_DIRECTORY,STREAMLIT_MODEL_DIRECTORY,
+LOCAL_LOGOS_DIRECTORY,STREAMLIT_LOGOS_DIRECTORY
 import joblib
 import numpy as np
 import io 
@@ -525,28 +526,7 @@ pd_games = pd.read_excel(games_file_path)
 pd_players = pd.read_excel(players_file_path)
 
 model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
-
-# Caminho do arquivo do modelo
-target_file = '/mount/src/nba_prevision/model/prevision_model.pkl'
-
-# Mostrar o caminho do arquivo alvo
-st.write(f"O caminho do arquivo alvo é: {target_file}")
-
-# Verificar se o arquivo existe
-if os.path.isfile(target_file):
-    st.write(f"O arquivo '{target_file}' existe ---.")
-else:
-    st.write(f"O arquivo '{target_file}' não foi encontrado.")
-
-# Tentar carregar o modelo e capturar o erro
-try:
-    model = joblib.load(target_file)
-    st.write("Modelo carregado com sucesso!")
-except Exception as e:
-    st.write(f"Erro ao carregar o modelo: {e}")
-
-
-model = joblib.load(target_file)
+model = joblib.load(model_path)
 
 
 title_style = """
@@ -595,8 +575,8 @@ if st.button("Get previsions"):
                 else:
                     winning_team =game['VISITOR_TEAM_NAME']
                 
-                visitor_logo = f"logos/{game['VISITOR_TEAM_NAME']}.png"
-                home_logo = f"logos/{game['HOME_TEAM_NAME']}.png"
+                visitor_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['VISITOR_TEAM_NAME']}.png"
+                home_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['HOME_TEAM_NAME']}.png"
 
                 
                 display_team_matchup(
