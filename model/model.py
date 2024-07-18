@@ -529,15 +529,15 @@ model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
 current_path = os.getcwd()
 st.write(f"O caminho atual é: {current_path}")
 
-# Listar arquivos no diretório atual
-files_in_directory = os.listdir(current_path)
-st.write("Arquivos no diretório atual:")
-st.write(files_in_directory)
-
-# Verificar se um arquivo específico existe
-file_to_check = 'nome_do_arquivo.pkl'
-file_exists = os.path.isfile(file_to_check)
-st.write(f"Arquivo '{file_to_check}' existe: {file_exists}")
+# Listar arquivos e pastas no diretório atual
+entries_in_directory = os.listdir(current_path)
+st.write("Arquivos e pastas no diretório atual:")
+for entry in entries_in_directory:
+    full_path = os.path.join(current_path, entry)
+    if os.path.isdir(full_path):
+        st.write(f"📁 {entry} (Pasta)")
+    else:
+        st.write(f"📄 {entry} (Arquivo)")
 
 model = joblib.load(model_path)
 
