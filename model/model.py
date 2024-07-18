@@ -545,6 +545,9 @@ title_style = """
             left: 0; /* Alinha à esquerda */
             z-index: 1000; /* Garante que a barra fique acima de outros elementos */
         }
+        .content {
+            margin-top: 80px; /* Ajuste este valor conforme necessário */
+        }
     </style>
 """
 
@@ -553,6 +556,15 @@ st.markdown(title_style, unsafe_allow_html=True)
 
 # Exibir o título com a classe CSS definida
 st.markdown("<div class='title-bar'>NBA GAME PREDICTOR</div>", unsafe_allow_html=True)
+
+# Adicionar uma classe de conteúdo para aplicar a margem superior
+st.markdown("<div class='content'>", unsafe_allow_html=True)
+
+# Conteúdo da sua aplicação
+st.write("Conteúdo da aplicação vai aqui.")
+
+# Fechar a div de conteúdo
+st.markdown("</div>", unsafe_allow_html=True)
 
 # Widget de entrada de data
 selected_date = st.date_input("Choose the day you want previsions for", date.today())
@@ -587,10 +599,9 @@ if st.button("Get previsions"):
                 )
                 
         else:
-            st.write("ENTRA AQUI")
             st.write("No games found for the chosen date")
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        st.write("No games found for the chosen date")
 
 
 
