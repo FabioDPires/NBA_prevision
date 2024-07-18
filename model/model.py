@@ -7,8 +7,12 @@ import json
 import pandas as pd
 import os
 from env import LOCAL_DATA_DIRECTORY, STREAMLIT_DATA_DIRECTORY
-
-SEASON_ID=2023
+import joblib
+import numpy as np
+import io 
+from PIL import Image
+import base64
+from io import BytesIO
 
 def get_nba_season_id(date):
     if date.month in range(1, 7):
@@ -73,6 +77,8 @@ def add_team_info(game, teams):
     else:
         home_team_id = None
         home_team_foundation = None
+    if home_team_foundation is None:
+        raise ValueError("Value error")
 
     visitor_team_info = teams.loc[teams['nickname'] == game['VISITOR_TEAM_NAME'], ['id', 'year_founded']]
     if not visitor_team_info.empty:
@@ -82,10 +88,13 @@ def add_team_info(game, teams):
         visitor_team_id = None
         visitor_team_foundation = None
 
+    if visitor_team_foundation is None:
+        raise ValueError("Value error")
+
     game['HOME_TEAM_ID'] = home_team_id
-    game['FOUNDATION_HOME'] = home_team_foundation
+    game['FOUNDATION_HOME'] = int(home_team_foundation)
     game['VISITOR_TEAM_ID'] = visitor_team_id
-    game['FOUNDATION_VISITOR'] = visitor_team_foundation
+    game['FOUNDATION_VISITOR'] = int(visitor_team_foundation)
     
     return game
 
@@ -104,7 +113,7 @@ def calculate_team_stats(team_id, pd_games, season_id, selected_date):
     total_losses = total_games - total_wins
     win_percentage = round(total_wins / total_games if total_games > 0 else 0.0, 3)
 
-    return total_games, total_wins, total_losses, win_percentage
+    return total_games, int(total_wins), int(total_losses), win_percentage
 
 
 def calculate_team_stats_at_home(team_id,pd_games,season_id,selected_date):     
@@ -406,7 +415,7 @@ def add_game_info(game, pd_games,pd_players, season_id, selected_date):
     #AWAY TEAM
     visitor_team_id = game["VISITOR_TEAM_ID"]
     visitor_stats = calculate_team_stats(visitor_team_id, pd_games, season_id, selected_date)
-    game['VISITOR_TEAM_TOTAL_GAMES'], game['VISITOR_TEAM_TOTAL_WINS'], game['VISITOR_TEAM_TOTAL_LOSSES'], game['VISITOR_TEAM_WIN_PERCENTAGE'] = visitor_stats
+    game['AWAY_TEAM_TOTAL_GAMES'], game['AWAY_TEAM_TOTAL_WINS'], game['AWAY_TEAM_TOTAL_LOSSES'], game['AWAY_TEAM_WIN_PERCENTAGE'] = visitor_stats
 
     visitor_stats_away = calculate_team_stats_away(visitor_team_id,pd_games,season_id,selected_date)
     game['AWAY_TEAM_WIN_PERCENTAGE_AWAY'] = visitor_stats_away
@@ -425,6 +434,88 @@ def add_game_info(game, pd_games,pd_players, season_id, selected_date):
 
     return game
 
+def process_input(input_data):
+    processed_data = [
+        input_data["HOME_TEAM_TOTAL_GAMES"],
+        input_data["HOME_TEAM_TOTAL_WINS"],
+        input_data["AWAY_TEAM_TOTAL_WINS"],
+        input_data["HOME_TEAM_TOTAL_LOSSES"],
+        input_data["AWAY_TEAM_TOTAL_LOSSES"],
+        input_data["HOME_TEAM_WIN_PERCENTAGE"],
+        input_data["AWAY_TEAM_WIN_PERCENTAGE"],
+        input_data["HOME_TEAM_TOTAL_LOSSES_AT_HOME"],
+        input_data["HOME_TEAM_WIN_PERCENTAGE_AT_HOME"],
+        input_data["AWAY_TEAM_WIN_PERCENTAGE_AWAY"],
+        input_data["HOME_TEAM_WIN/LOSS_STREAK_AT_HOME"],
+        input_data["AVG_POINTS_LAST_5_GAMES_HOME_TEAM"],
+        input_data["AVG_POINTS_LAST_5_GAMES_VISITOR_TEAM"],
+        input_data["AVG_POINTS_CONCEDED_LAST_5_GAMES_HOME_TEAM"],
+        input_data["AVG_POINTS_CONCEDED_LAST_5_GAMES_VISITOR_TEAM"],
+        input_data["AVG_ASSISTS_LAST_5_GAMES_HOME_TEAM"],
+        input_data["AVG_ASSISTS_LAST_5_GAMES_VISITOR_TEAM"],
+        input_data["AVG_FGPCT_LAST_5_GAMES_HOME_TEAM"],
+        input_data["AVG_FGPCT_LAST_5_GAMES_VISITOR_TEAM"],
+        input_data["AVG_FTPCT_LAST_5_GAMES_HOME_TEAM"],
+        input_data["AVG_FTPCT_LAST_5_GAMES_VISITOR_TEAM"],
+        input_data["AVG_FG3PCT_LAST_5_GAMES_HOME_TEAM"],
+        input_data["AVG_FG3PCT_LAST_5_GAMES_VISITOR_TEAM"],
+        input_data["AVG_REB_LAST_5_GAMES_HOME_TEAM"],
+        input_data["AVG_REB_LAST_5_GAMES_VISITOR_TEAM"],
+        input_data["AVG_POINTS_LAST_5_GAMES_AT_HOME_HOME_TEAM"],
+        input_data["AVG_POINTS_CONCEDED_LAST_5_GAMES_AT_HOME_HOME_TEAM"],
+        input_data["AVG_ASSISTS_LAST_5_GAMES_AT_HOME_HOME_TEAM"],
+        input_data["AVG_REB_LAST_5_GAMES_AT_HOME_HOME_TEAM"],
+        input_data["AVG_POINTS_LAST_5_GAMES_AWAY_VISITOR_TEAM"],
+        input_data["AVG_POINTS_CONCEDED_LAST_5_GAMES_AWAY_VISITOR_TEAM"],
+        input_data["AVG_ASSISTS_LAST_5_GAMES_AWAY_VISITOR_TEAM"],
+        input_data["AVG_FG3PCT_LAST_5_GAMES_AWAY_VISITOR_TEAM"],
+        input_data["AVG_REB_LAST_5_GAMES_AWAY_VISITOR_TEAM"],
+        input_data["FOUNDATION_HOME"],
+        input_data["FOUNDATION_VISITOR"],
+        input_data["AVG_MINUTES_LAST_4_GAMES_HOME_TEAM"],
+        input_data["AVG_MINUTES_LAST_4_GAMES_VISITOR_TEAM"],
+        input_data["AVG_MINUTES_STARTERS_LAST_4_GAMES_HOME_TEAM"],
+        input_data["AVG_MINUTES_STARTERS_LAST_4_GAMES_VISITOR_TEAM"]
+    ]
+    return np.array(processed_data).reshape(1, -1)
+
+def predict(input_data):
+    return model.predict(input_data)
+
+def image_to_base64(img):
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+    return img_str
+
+def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, home_logo_url, prediction):
+    visitor_logo = Image.open(visitor_logo_url)
+    home_logo = Image.open(home_logo_url)
+
+    visitor_logo_base64 = image_to_base64(visitor_logo)
+    home_logo_base64 = image_to_base64(home_logo)
+    
+    st.markdown(f"""
+        <div style='display: flex; align-items: center; justify-content: center;'>
+            <div style='text-align: center; margin-right: 30px;'>
+                <img src='data:image/png;base64,{visitor_logo_base64}' width='100' height='100' style='display: block; margin: auto;' />
+                <div><strong>{visitor_team_name}</strong></div>
+            </div>
+            <div style='text-align: center; margin: 0 30px; font-size: 32px;'>
+                @
+            </div>
+            <div style='text-align: center; margin-left: 30px;'>
+                <img src='data:image/png;base64,{home_logo_base64}' width='100' height='100' style='display: block; margin: auto;' />
+                <div><strong>{home_team_name}</strong></div>
+            </div>
+        </div>
+        <div style='text-align: center; margin-top: 20px;'>
+            <strong>Prediction: {prediction} Wins</strong>
+        </div>
+        <hr style='margin-top: 20px;' />
+    """, unsafe_allow_html=True)
+
+
 
 nba_teams_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'nba_teams.xlsx')
 games_file_path = os.path.join(LOCAL_DATA_DIRECTORY, 'games.xlsx')
@@ -433,10 +524,34 @@ pd_teams = pd.read_excel(nba_teams_file_path)
 pd_games = pd.read_excel(games_file_path)
 pd_players = pd.read_excel(players_file_path)
 
+model = joblib.load('prevision_model.pkl')
 
 
-# Título da aplicação
-st.title("NBA GAME PREDICTOR")
+title_style = """
+    <style>
+        .title-bar {
+            background-color: #ff6f00; /* Cor laranja semelhante à de uma bola de basquete */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            width: 100vw; /* Ocupa toda a largura da janela de visualização */
+            box-sizing: border-box; /* Inclui padding na largura total */
+            margin: 0; /* Remove margens padrão */
+            position: fixed; /* Fixa a barra no topo da página */
+            top: 0; /* Alinha no topo */
+            left: 0; /* Alinha à esquerda */
+            z-index: 1000; /* Garante que a barra fique acima de outros elementos */
+        }
+    </style>
+"""
+
+# Inserir o estilo CSS no Markdown
+st.markdown(title_style, unsafe_allow_html=True)
+
+# Exibir o título com a classe CSS definida
+st.markdown("<div class='title-bar'>NBA GAME PREDICTOR</div>", unsafe_allow_html=True)
 
 # Widget de entrada de data
 selected_date = st.date_input("Choose the day you want previsions for", date.today())
@@ -445,15 +560,36 @@ formatted_date = selected_date.strftime("%m/%d/%Y")
 season_id = get_nba_season_id(selected_date)
 
 if st.button("Get previsions"):
-    games = get_schedule(formatted_date,season_id)
-    if games:
-        for game in games:
-            game = add_team_info(game,pd_teams)
-            game = add_game_info(game,pd_games,pd_players,season_id,selected_date)
-            st.write(f"{game['VISITOR_TEAM_NAME']} @ {game['HOME_TEAM_NAME']}   ")
-    else:
-        st.write("No games found for the chosen date")
+    try:
+        games = get_schedule(formatted_date,season_id)
+        if games:
+            for game in games:
+                game = add_team_info(game,pd_teams)
+                game = add_game_info(game,pd_games,pd_players,season_id,selected_date)
+                processed_data = process_input(game)
+                prediction=predict(processed_data)
+                if prediction == 1:
+                    winning_team = game['HOME_TEAM_NAME']
+                else:
+                    winning_team =game['VISITOR_TEAM_NAME']
+                
+                visitor_logo = f"logos/{game['VISITOR_TEAM_NAME']}.png"
+                home_logo = f"logos/{game['HOME_TEAM_NAME']}.png"
 
+                
+                display_team_matchup(
+                    visitor_team_name=game['VISITOR_TEAM_NAME'],
+                    home_team_name=game['HOME_TEAM_NAME'],
+                    visitor_logo_url=visitor_logo,
+                    home_logo_url=home_logo,
+                    prediction=winning_team
+                )
+                
+        else:
+            st.write("ENTRA AQUI")
+            st.write("No games found for the chosen date")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
 
 
