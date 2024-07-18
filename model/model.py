@@ -528,9 +528,19 @@ model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
 model = joblib.load(model_path)
 
 
-st.title("NBA GAME PREDICTOR")
+title_html = """
+    <style>
+    .title {
+        text-align: center;
+    }
+    </style>
+    <h1 class="title">NBA GAME PREDICTOR</h1>
+    """
 
-# Widget de entrada de data
+# Exibir o HTML no Streamlit
+st.markdown(title_html, unsafe_allow_html=True)
+
+
 selected_date = st.date_input("Choose the day you want previsions for", date.today())
 formatted_date = selected_date.strftime("%m/%d/%Y")
 
