@@ -6,7 +6,7 @@ from datetime import datetime
 import json
 import pandas as pd
 import os
-from env import LOCAL_DATA_DIRECTORY, STREAMLIT_DATA_DIRECTORY
+from env import LOCAL_DATA_DIRECTORY, STREAMLIT_DATA_DIRECTORY,LOCAL_MODEL_DIRECTORY,STREAMLIT_MODEL_DIRECTORY
 import joblib
 import numpy as np
 import io 
