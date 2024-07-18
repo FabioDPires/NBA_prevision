@@ -527,58 +527,34 @@ pd_players = pd.read_excel(players_file_path)
 model_path = os.path.join(STREAMLIT_MODEL_DIRECTORY, 'prevision_model.pkl')
 model = joblib.load(model_path)
 
-title_style = """
-    <style>
-        .title-bar {
-            background-color: #ff6f00; /* Cor laranja semelhante à de uma bola de basquete */
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 36px;
-            font-weight: bold;
-            width: 100vw; /* Ocupa toda a largura da janela de visualização */
-            box-sizing: border-box; /* Inclui padding na largura total */
-            margin: 0; /* Remove margens padrão */
-            position: fixed; /* Fixa a barra no topo da página */
-            top: 0; /* Alinha no topo */
-            left: 0; /* Alinha à esquerda */
-            z-index: 1000; /* Garante que a barra fique acima de outros elementos */
-        }
-        .content {
-            margin-top: 100px; /* Ajuste este valor conforme necessário */
-        }
-        /* Ajusta a barra padrão do Streamlit */
-        .stApp {
-            padding-top: 120px; /* Ajuste este valor conforme necessário */
-        }
-    </style>
-"""
-st.markdown(title_style, unsafe_allow_html=True)
-st.markdown("<div class='title-bar'>NBA GAME PREDICTOR</div>", unsafe_allow_html=True)
-st.markdown("<div class='content'>", unsafe_allow_html=True)
 
+st.title("NBA GAME PREDICTOR")
+
+# Widget de entrada de data
 selected_date = st.date_input("Choose the day you want previsions for", date.today())
 formatted_date = selected_date.strftime("%m/%d/%Y")
 
 season_id = get_nba_season_id(selected_date)
 
+
 if st.button("Get previsions"):
     try:
-        games = get_schedule(formatted_date, season_id)
+        games = get_schedule(formatted_date,season_id)
         if games:
             for game in games:
-                game = add_team_info(game, pd_teams)
-                game = add_game_info(game, pd_games, pd_players, season_id, selected_date)
+                game = add_team_info(game,pd_teams)
+                game = add_game_info(game,pd_games,pd_players,season_id,selected_date)
                 processed_data = process_input(game)
-                prediction = predict(processed_data)
+                prediction=predict(processed_data)
                 if prediction == 1:
                     winning_team = game['HOME_TEAM_NAME']
                 else:
-                    winning_team = game['VISITOR_TEAM_NAME']
-
+                    winning_team =game['VISITOR_TEAM_NAME']
+                
                 visitor_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['VISITOR_TEAM_NAME']}.png"
                 home_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['HOME_TEAM_NAME']}.png"
 
+                
                 display_team_matchup(
                     visitor_team_name=game['VISITOR_TEAM_NAME'],
                     home_team_name=game['HOME_TEAM_NAME'],
@@ -586,16 +562,11 @@ if st.button("Get previsions"):
                     home_logo_url=home_logo,
                     prediction=winning_team
                 )
-
+                
         else:
             st.write("No games found for the chosen date")
     except Exception as e:
         st.write("No games found for the chosen date")
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-
-
 
 
 
