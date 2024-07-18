@@ -572,26 +572,6 @@ formatted_date = selected_date.strftime("%m/%d/%Y")
 
 season_id = get_nba_season_id(selected_date)
 
-button_style = """
-    <style>
-        .stButton button {
-            font-size: 20px !important; /* Aumenta o tamanho do texto */
-            padding: 10px 20px !important; /* Aumenta o padding do botão */
-        }
-    </style>
-"""
-
-# Insere o estilo CSS no Markdown
-st.markdown(button_style, unsafe_allow_html=True)
-
-# Cria três colunas para centralizar o botão na coluna do meio
-col1, col2, col3 = st.columns([1, 2, 1])
-
-# Adiciona o botão na coluna do meio
-with col2:
-    if st.button("Predict"):
-        st.write("Button clicked!")
-
 
 if st.button("Get previsions"):
     try:
