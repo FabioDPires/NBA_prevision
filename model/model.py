@@ -547,7 +547,7 @@ formatted_date = selected_date.strftime("%m/%d/%Y")
 season_id = get_nba_season_id(selected_date)
 
 
-if st.button("Get previsions"):
+if st.button("Get predictions"):
     try:
         games = get_schedule(formatted_date,season_id)
         if games:
@@ -578,7 +578,30 @@ if st.button("Get previsions"):
     except Exception as e:
         st.write("No games found for the chosen date")
 
+# Adicionar o footer com as informações sobre as limitações do modelo de previsão
+footer_html = """
+    <style>
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #f1f1f1;
+        text-align: center;
+        padding: 10px;
+        font-size: 12px;
+        color: #333;
+    }
+    </style>
+    <div class="footer">
+    Disclaimer: The predictions provided by this model are based on statistical analysis and historical data but do not guarantee a 100% accuracy rate.
+    NBA games involve unpredictable variables and events beyond our control.
+    Use these predictions as a reference, not as a certainty.
+    </div>
+    """
 
+# Exibir o footer no Streamlit
+st.markdown(footer_html, unsafe_allow_html=True)
 
 
 
