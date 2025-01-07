@@ -494,6 +494,8 @@ def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, ho
 
     visitor_logo_base64 = image_to_base64(visitor_logo)
     home_logo_base64 = image_to_base64(home_logo)
+
+    st.write(data)
     
     st.markdown(f"""
         <div style='display: flex; align-items: center; justify-content: center;'>
@@ -574,7 +576,6 @@ if st.button("Get predictions"):
 
                 visitor_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['VISITOR_TEAM_NAME']}.png"
                 home_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['HOME_TEAM_NAME']}.png"
-                st.write(game)
                 
                 display_team_matchup(
                     visitor_team_name=game['VISITOR_TEAM_NAME'],
