@@ -495,25 +495,33 @@ def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, ho
     visitor_logo_base64 = image_to_base64(visitor_logo)
     home_logo_base64 = image_to_base64(home_logo)
     
-    st.markdown(f"""
-        <div style='display: flex; align-items: center; justify-content: center;'>
-            <div style='text-align: center; margin-right: 30px;'>
-                <img src='data:image/png;base64,{visitor_logo_base64}' width='100' height='100' style='display: block; margin: auto;' />
-                <div><strong>{visitor_team_name}</strong></div>
-            </div>
-            <div style='text-align: center; margin: 0 30px; font-size: 32px;'>
-                @
-            </div>
-            <div style='text-align: center; margin-left: 30px;'>
-                <img src='data:image/png;base64,{home_logo_base64}' width='100' height='100' style='display: block; margin: auto;' />
-                <div><strong>{home_team_name}</strong></div>
-            </div>
+st.markdown(f"""
+    <div style='display: flex; align-items: center; justify-content: center;'>
+        <div style='text-align: center; margin-right: 30px;'>
+            <img src='data:image/png;base64,{visitor_logo_base64}' width='100' height='100' style='display: block; margin: auto;' />
+            <div><strong>{visitor_team_name}</strong></div>
         </div>
-        <div style='text-align: center; margin-top: 20px;'>
-            <strong>Prediction: {prediction} Wins ({probability}%) </strong>
+        <div style='text-align: center; margin: 0 30px; font-size: 32px;'>
+            @
         </div>
-        <hr style='margin-top: 20px;' />
-    """, unsafe_allow_html=True)
+        <div style='text-align: center; margin-left: 30px;'>
+            <img src='data:image/png;base64,{home_logo_base64}' width='100' height='100' style='display: block; margin: auto;' />
+            <div><strong>{home_team_name}</strong></div>
+        </div>
+    </div>
+    <div style='text-align: center; margin-top: 20px;'>
+        <strong>Prediction: {prediction} Win ({probability * 100:.2f}%) </strong>
+    </div>
+    <div style='text-align: center; margin-top: 10px;'>
+        { # Adjusting color based on risk
+        }
+        {"<strong style='color: red;'>Risky</strong>" if probability < 0.6 else
+        "<strong style='color: yellow;'>Medium Risk</strong>" if probability < 0.7 else
+        "<strong style='color: green;'>Safe</strong>" if probability < 0.9 else
+        "<strong style='color: darkgreen;'>Almost certain</strong>"}
+    </div>
+    <hr style='margin-top: 20px;' />
+""", unsafe_allow_html=True)
 
 
 
@@ -558,10 +566,6 @@ if st.button("Get predictions"):
                 probabilities = model.predict_proba(processed_data)
                 home_team_win_probability = probabilities[0][1]
                 visitor_team_win_probability = probabilities[0][0]
-                
-                st.write(f'**Probabilidades de Vitória:**')
-                st.write(f'Probabilidade do time da casa ganhar: {home_team_win_probability * 100:.2f}%')
-                st.write(f'Probabilidade do time visitante ganhar: {visitor_team_win_probability * 100:.2f}%')
 
                 if(home_team_win_probability >= visitor_team_win_probability):
                      winning_team = game['HOME_TEAM_NAME']
@@ -569,13 +573,7 @@ if st.button("Get predictions"):
                 else:
                     winning_team =game['VISITOR_TEAM_NAME']
                     probability = visitor_team_win_probability
-                '''
-                prediction=predict(processed_data)
-                if prediction == 1:
-                    winning_team = game['HOME_TEAM_NAME']
-                else:
-                    winning_team =game['VISITOR_TEAM_NAME']
-                '''
+
                 visitor_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['VISITOR_TEAM_NAME']}.png"
                 home_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['HOME_TEAM_NAME']}.png"
 
