@@ -574,7 +574,7 @@ if st.button("Get predictions"):
 
                 visitor_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['VISITOR_TEAM_NAME']}.png"
                 home_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['HOME_TEAM_NAME']}.png"
-
+                st.write(game)
                 
                 display_team_matchup(
                     visitor_team_name=game['VISITOR_TEAM_NAME'],
