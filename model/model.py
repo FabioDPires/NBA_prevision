@@ -499,14 +499,14 @@ def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, ho
         <div style='display: flex; align-items: center; justify-content: center;'>
             <div style='text-align: center; margin-right: 30px;'>
                 <img src='data:image/png;base64,{visitor_logo_base64}' width='100' height='100' style='display: block; margin: auto;' />
-                <div><strong>{visitor_team_name}</strong></div>
+                <div><strong>{visitor_team_name} ({data.AWAY_TEAM_TOTAL_WINS}W-{AWAY_TEAM_TOTAL_LOSSES}L) </strong></div>
             </div>
             <div style='text-align: center; margin: 0 30px; font-size: 32px;'>
                 @
             </div>
             <div style='text-align: center; margin-left: 30px;'>
                 <img src='data:image/png;base64,{home_logo_base64}' width='100' height='100' style='display: block; margin: auto;' />
-                <div><strong>{home_team_name}</strong></div>
+                <div><strong>{home_team_name} ({data.HOME_TEAM_TOTAL_WINS}W-{HOME_TEAM_TOTAL_LOSSES}L)</strong></div>
             </div>
         </div>
         <div style='text-align: center; margin-top: 20px;'>
