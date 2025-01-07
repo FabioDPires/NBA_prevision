@@ -524,12 +524,12 @@ def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, ho
         <div style='text-align: center; margin-top: 30px;'>
            <strong><span style="font-size: 20px;">Prediction: {prediction} Win ({probability * 100:.2f}%)</span></strong>
         </div>
-        <div style='text-align: center; margin-top: 10px;'>
-        {'<strong style="color: red;">Risky</strong>' if probability < 0.6 else
-         '<strong style="color: orange;">Medium Risk</strong>' if probability < 0.7 else
-         '<strong style="color: lightgreen;">Safe</strong>' if probability < 0.9 else
-         '<strong style="color: darkgreen;">Almost certain</strong>'}
-    </div>
+<div style='text-align: center; margin-top: 10px;'>
+    {'<strong style="color: red; font-size: 20px;">Risky</strong>' if probability < 0.6 else
+     '<strong style="color: orange; font-size: 20px;">Medium Risk</strong>' if probability < 0.7 else
+     '<strong style="color: lightgreen; font-size: 20px;">Safe</strong>' if probability < 0.9 else
+     '<strong style="color: darkgreen; font-size: 20px;">Almost certain</strong>'}
+</div>
         <hr style='margin-top: 20px;' />
     """, unsafe_allow_html=True)
 
