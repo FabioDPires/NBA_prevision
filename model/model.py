@@ -504,7 +504,7 @@ def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, ho
                 <span>-</span>
                 <span style='color: red;'>{data["AWAY_TEAM_TOTAL_LOSSES"]}L</span>)</strong>
             </div>
-                        <div><strong> Won {data["AWAY_TEAM_WIN_PERCENTAGE_AWAY"]*100:.1f}% of the games on the road </span>
+                        <div>Won {data["AWAY_TEAM_WIN_PERCENTAGE_AWAY"]*100:.1f}% of the games on the road </span>
             </strong></div>
             </div>
             <div style='text-align: center; margin: 0 30px; font-size: 32px;'>
@@ -517,7 +517,7 @@ def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, ho
                 <span>-</span>
                 <span style='color: red;'>{data["HOME_TEAM_TOTAL_LOSSES"]}L</span>)</strong>
             </div>
-            <div><strong> Won {data["HOME_TEAM_WIN_PERCENTAGE_AT_HOME"]*100:.1f}% of the games at home </span>
+            <div>Won {data["HOME_TEAM_WIN_PERCENTAGE_AT_HOME"]*100:.1f}% of the games at home </span>
             </strong></div>
             </div>
         </div>
