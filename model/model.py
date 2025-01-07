@@ -522,7 +522,7 @@ def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, ho
             </div>
         </div>
         <div style='text-align: center; margin-top: 30px;'>
-            <strong>Prediction: {prediction} Win ({probability * 100:.2f}%) </strong>
+           <strong><span style="font-size: 20px;">Prediction: {prediction} Win ({probability * 100:.2f}%)</span></strong>
         </div>
         <div style='text-align: center; margin-top: 10px;'>
         {'<strong style="color: red;">Risky</strong>' if probability < 0.6 else
