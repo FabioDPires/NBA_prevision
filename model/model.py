@@ -488,7 +488,7 @@ def image_to_base64(img):
     img_str = base64.b64encode(buffered.getvalue()).decode()
     return img_str
 
-def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, home_logo_url, prediction):
+def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, home_logo_url, prediction, probability):
     visitor_logo = Image.open(visitor_logo_url)
     home_logo = Image.open(home_logo_url)
 
@@ -510,7 +510,7 @@ def display_team_matchup(visitor_team_name, home_team_name, visitor_logo_url, ho
             </div>
         </div>
         <div style='text-align: center; margin-top: 20px;'>
-            <strong>Prediction: {prediction} Wins</strong>
+            <strong>Prediction: {prediction} Wins ({probability}%) </strong>
         </div>
         <hr style='margin-top: 20px;' />
     """, unsafe_allow_html=True)
@@ -555,12 +555,27 @@ if st.button("Get predictions"):
                 game = add_team_info(game,pd_teams)
                 game = add_game_info(game,pd_games,pd_players,season_id,selected_date)
                 processed_data = process_input(game)
+                probabilities = model.predict_proba(processed_data)
+                home_team_win_probability = probabilities[0][1]
+                visitor_team_win_probability = probabilities[0][0]
+                
+                st.write(f'**Probabilidades de Vitória:**')
+                st.write(f'Probabilidade do time da casa ganhar: {home_team_win_probability * 100:.2f}%')
+                st.write(f'Probabilidade do time visitante ganhar: {visitor_team_win_probability * 100:.2f}%')
+
+                if(home_team_win_probability >= visitor_team_win_probability):
+                     winning_team = game['HOME_TEAM_NAME']
+                     probability = home_team_win_probability
+                else:
+                    winning_team =game['VISITOR_TEAM_NAME']
+                    probability = visitor_team_win_probability
+                '''
                 prediction=predict(processed_data)
                 if prediction == 1:
                     winning_team = game['HOME_TEAM_NAME']
                 else:
                     winning_team =game['VISITOR_TEAM_NAME']
-                
+                '''
                 visitor_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['VISITOR_TEAM_NAME']}.png"
                 home_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['HOME_TEAM_NAME']}.png"
 
@@ -570,7 +585,8 @@ if st.button("Get predictions"):
                     home_team_name=game['HOME_TEAM_NAME'],
                     visitor_logo_url=visitor_logo,
                     home_logo_url=home_logo,
-                    prediction=winning_team
+                    prediction = winning_team,
+                    probability = probability
                 )
                 
         else:
