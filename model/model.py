@@ -583,7 +583,7 @@ if st.button("Get predictions"):
                     home_logo_url=home_logo,
                     prediction = winning_team,
                     probability = probability,
-                    data = processed_data
+                    data = game
                 )
                 
         else:
