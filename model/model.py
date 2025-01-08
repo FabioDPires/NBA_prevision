@@ -574,14 +574,6 @@ if st.button("Get predictions"):
                 game = add_game_info(game,pd_games,pd_players,season_id,selected_date)
                 processed_data = process_input(game)
 
-                if np.isnan(processed_data).any():
-                    st.write("O array contém valores NaN.")
-                    
-                    # Identifica a posição dos NaNs
-                    nan_indices = np.argwhere(np.isnan(processed_data))
-                    st.write("Posições dos NaNs (linha, coluna):")
-                    st.write(nan_indices)
-
                 probabilities = model.predict_proba(processed_data)
                 home_team_win_probability = probabilities[0][1]
                 visitor_team_win_probability = probabilities[0][0]
