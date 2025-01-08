@@ -601,6 +601,7 @@ if st.button("Get predictions"):
             st.write("No games found for the chosen date")
     except Exception as e:
         st.write(f"Something went wrong")
+        st.write(f"Error: {e}")
 
 # Adicionar o footer com as informações sobre as limitações do modelo de previsão
 footer_html = """
