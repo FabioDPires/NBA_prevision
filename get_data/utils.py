@@ -10,6 +10,14 @@ def clean_data_folder():
         if os.path.exists(file_path):
             os.remove(file_path)
 
+def clean_previous_data():
+    folder = os.path.dirname(os.path.abspath(__file__))
+    for file in os.listdir(folder):
+        if file.endswith(".xlsx"):
+            filepath = os.path.join(folder, file)
+            os.remove(filepath)
+
+
 def extract_minutes(min_str):
     match = re.match(r'(\d+)', min_str)
     if match:

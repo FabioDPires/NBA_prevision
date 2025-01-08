@@ -9,6 +9,7 @@ START_DATE = '2024-10-22'
 END_DATE = '2025-01-07'
 SEASON = '2024-25'
 
+utils.clean_previous_data()
 #utils.clean_data_folder()
 
 print("Getting games headers")
