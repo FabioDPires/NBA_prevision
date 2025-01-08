@@ -574,17 +574,19 @@ if st.button("Get predictions"):
                 game = add_game_info(game,pd_games,pd_players,season_id,selected_date)
                 processed_data = process_input(game)
 
-                # Verifica se há valores NaN no DataFrame
-                if processed_data.isnull().any().any():
-                    st.write("O DataFrame contém valores NaN.")
-                    st.write("Resumo dos valores NaN por coluna:")
-                    st.write(processed_data.isnull().sum())
+                if np.isnan(processed_data).any():
+                    st.write("O array contém valores NaN.")
+                    
+                    # Identifica a posição dos NaNs
+                    nan_indices = np.argwhere(np.isnan(processed_data))
+                    st.write("Posições dos NaNs (linha, coluna):")
+                    st.write(nan_indices)
 
-                    # Exibe as linhas que contêm NaN
-                    st.write("Linhas com valores NaN:")
-                    st.write(processed_data[processed_data.isnull().any(axis=1)])
+                    # Opcional: Exibe o array com valores NaN destacados
+                    st.write("Array com NaNs:")
+                    st.write(processed_data)
                 else:
-                    st.write("Nenhum NaN encontrado no DataFrame.")
+                    st.write("Nenhum NaN encontrado no array.")
 
                 probabilities = model.predict_proba(processed_data)
                 home_team_win_probability = probabilities[0][1]
