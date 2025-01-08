@@ -582,16 +582,7 @@ if st.button("Get predictions"):
                     st.write("Posições dos NaNs (linha, coluna):")
                     st.write(nan_indices)
                     
-                    # Adiciona nomes das colunas
-                    st.write("Colunas com NaNs e respetivas posições:")
-                    for linha, coluna in nan_indices:
-                        st.write(f"Linha: {linha}, Coluna: {df.columns[coluna]}")
-                    
-                    # Opcional: Exibe o array com valores NaN destacados
-                    st.write("Array com NaNs:")
-                    st.write(processed_data)
-                else:
-                    st.write("Nenhum NaN encontrado no array.")
+                    "Nomes das colunas:", list(processed_data.columns)
 
                 probabilities = model.predict_proba(processed_data)
                 home_team_win_probability = probabilities[0][1]
