@@ -582,7 +582,7 @@ if st.button("Get predictions"):
                     st.write("Posições dos NaNs (linha, coluna):")
                     st.write(nan_indices)
                     
-                    st.write("Nomes das colunas:", list(processed_data.columns))
+                    st.write(processed_data)
 
                 probabilities = model.predict_proba(processed_data)
                 home_team_win_probability = probabilities[0][1]
