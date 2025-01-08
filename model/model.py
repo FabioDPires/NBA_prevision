@@ -581,8 +581,6 @@ if st.button("Get predictions"):
                     nan_indices = np.argwhere(np.isnan(processed_data))
                     st.write("Posições dos NaNs (linha, coluna):")
                     st.write(nan_indices)
-                    
-                    st.write(processed_data)
 
                 probabilities = model.predict_proba(processed_data)
                 home_team_win_probability = probabilities[0][1]
