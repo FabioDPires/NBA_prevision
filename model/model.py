@@ -581,7 +581,12 @@ if st.button("Get predictions"):
                     nan_indices = np.argwhere(np.isnan(processed_data))
                     st.write("Posições dos NaNs (linha, coluna):")
                     st.write(nan_indices)
-
+                    
+                    # Adiciona nomes das colunas
+                    st.write("Colunas com NaNs e respetivas posições:")
+                    for linha, coluna in nan_indices:
+                        st.write(f"Linha: {linha}, Coluna: {df.columns[coluna]}")
+                    
                     # Opcional: Exibe o array com valores NaN destacados
                     st.write("Array com NaNs:")
                     st.write(processed_data)
