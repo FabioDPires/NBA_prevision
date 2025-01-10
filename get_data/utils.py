@@ -1,7 +1,7 @@
 import os
 import re
 
-def clean_data_folder():
+def update_data_folder():
     folder_path = "../model/data"
     files_to_delete = ["games.xlsx", "players.xlsx"]
 
