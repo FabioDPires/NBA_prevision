@@ -9,7 +9,6 @@ START_DATE = '2024-10-22'
 END_DATE = utils.getPreviousDay()
 SEASON = '2024-25'
 
-'''
 utils.clean_previous_data()
 print("Getting games headers")
 headers.get_headers(START_DATE,END_DATE)
@@ -19,5 +18,4 @@ merge_headers_lines.merge_headers_lines()
 print("Getting player details")
 players.get_players(SEASON,SEASON_BEGIN_DATE)
 utils.update_data_folder()
-'''
 utils.commit_changes()
