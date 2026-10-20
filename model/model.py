@@ -24,6 +24,7 @@ def get_nba_season_id(date):
 def get_schedule(date, season_id=None):
     schedule_file_path = os.path.join(
         STREAMLIT_MODEL_DIRECTORY,
+        "data",
         "schedule.xlsx"
     )
 
