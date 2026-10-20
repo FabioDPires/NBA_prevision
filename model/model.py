@@ -38,10 +38,11 @@ def get_schedule(date,season_id):
     # Faz a solicitação GET
     response = requests.get(url, headers=headers)
 
-    st.write("Status HTTP:", response.status_code)
-    st.write("URL:", response.url)
-    st.write("Content-Type:", response.headers.get("Content-Type"))
-    st.write("Resposta recebida:", repr(response.text[:1000]))
+    st.write("DEBUG - Status:", response.status_code)
+    st.write("DEBUG - Content-Type:", response.headers.get("Content-Type"))
+    st.write("DEBUG - URL final:", response.url)
+    st.write("DEBUG - Tamanho da resposta:", len(response.text))
+    st.write("DEBUG - Título/erro NBA:", response.text[:3000])
 
     # Verifica se a solicitação foi bem-sucedida
     if response.status_code == 200:
