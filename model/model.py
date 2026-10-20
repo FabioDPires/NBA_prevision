@@ -25,8 +25,8 @@ def get_schedule(date,season_id):
     # Define a URL
     url = f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season_id}&RegionID=0&Date={date}&EST=Y"
 
-st.write("URL")
-st.write(url)
+    st.write("URL")
+    st.write(url)
     # Define os cabeçalhos
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
