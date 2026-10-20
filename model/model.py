@@ -29,11 +29,17 @@ def get_schedule(date,season_id):
     st.write(url)
     # Define os cabeçalhos
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        "Referer": "https://stats.nba.com/",
-        "Origin": "https://stats.nba.com",
-        "Accept": "application/json, text/plain, */*"
-    }
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/130.0.0.0 Safari/537.36"
+        ),
+        "Referer": "https://www.nba.com/",
+        "Origin": "https://www.nba.com",
+        "Accept": "application/json, text/plain, */*",
+        "x-nba-stats-origin": "stats",
+        "x-nba-stats-token": "true"
+}
 
     # Faz a solicitação GET
     response = requests.get(url, headers=headers)
