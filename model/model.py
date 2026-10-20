@@ -25,6 +25,8 @@ def get_schedule(date,season_id):
     # Define a URL
     url = f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season_id}&RegionID=0&Date={date}&EST=Y"
 
+st.write("URL")
+st.write(url)
     # Define os cabeçalhos
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
@@ -571,27 +573,18 @@ season_id = get_nba_season_id(selected_date)
 
 if st.button("Get predictions"):
     try:
-        st.write("1. A obter calendário...")
         games = get_schedule(formatted_date, season_id)
 
         if games:
             for game in games:
-                st.write(f"2. A processar jogo: {game}")
-
                 game = add_team_info(game, pd_teams)
-                st.write("3. Informação das equipas adicionada.")
-
                 game = add_game_info(
                     game, pd_games, pd_players,
                     season_id, selected_date
                 )
-                st.write("4. Informação do jogo adicionada.")
 
                 processed_data = process_input(game)
-                st.write("5. Dados preparados para o modelo.")
-
                 probabilities = model.predict_proba(processed_data)
-                st.write("6. Previsões calculadas.")
 
                 home_prob = probabilities[0][1]
                 visitor_prob = probabilities[0][0]
