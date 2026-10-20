@@ -21,69 +21,30 @@ def get_nba_season_id(date):
         return date.year
 
 
-def get_schedule(date,season_id):
-    # Define a URL
-    url = f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season_id}&RegionID=0&Date={date}&EST=Y"
+def get_schedule(date, season_id=None):
+    schedule_file_path = os.path.join(
+        STREAMLIT_MODEL_DIRECTORY,
+        "schedule.xlsx"
+    )
 
-    st.write("URL")
-    st.write(url)
-    # Define os cabeçalhos
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/130.0.0.0 Safari/537.36"
-        ),
-        "Referer": "https://stats.nba.com/",
-        "Origin": "https://stats.nba.com",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Connection": "keep-alive",
-        "x-nba-stats-origin": "stats",
-        "x-nba-stats-token": "true"
-    }
+    df = pd.read_excel(schedule_file_path)
 
-    # Faz a solicitação GET
-    response = requests.get(url, headers=headers)
+    df["GAME_DATE"] = pd.to_datetime(
+        df["GAME_DATE"],
+        errors="coerce"
+    ).dt.strftime("%m/%d/%Y")
 
-    st.write("DEBUG - Status:", response.status_code)
-    st.write("DEBUG - Content-Type:", response.headers.get("Content-Type"))
-    st.write("DEBUG - URL final:", response.url)
-    st.write("DEBUG - Tamanho da resposta:", len(response.text))
-    st.write("DEBUG - Título/erro NBA:", response.text[:3000])
+    formatted_date = pd.to_datetime(date).strftime("%m/%d/%Y")
 
-    # Verifica se a solicitação foi bem-sucedida
-    if response.status_code == 200:
-        # Carrega os dados JSON da resposta
-        data = response.json()
-        
-        # Verifica se o 'CompleteGameList' está presente nos 'resultSets'
-        complete_game_list = []
-        for resultSet in data.get('resultSets', []):
-            if 'CompleteGameList' in resultSet:
-                complete_game_list = resultSet['CompleteGameList']
-                break
-        
-        # Armazena os jogos em um array e remove duplicatas
-        games_array = []
-        seen_game_ids = set()
-        
-        for game in complete_game_list:
-            game_id = game["gameID"]
-            if game_id not in seen_game_ids:
-                game_info = {
-                    "GAME_ID": game_id,
-                    "VISITOR_TEAM_NAME" :  game["vtNickName"],
-                    "HOME_TEAM_NAME" :  game["htNickName"],
-                    "GAME_DATE": game["date"],
-                }
-                games_array.append(game_info)
-                seen_game_ids.add(game_id)
-        
-        return games_array
-    else:
-        print(f"Falha ao acessar os dados. Status code: {response.status_code}")
-        return None
+    games = df[df["GAME_DATE"] == formatted_date].copy()
+
+    return games[
+        [
+            "VISITOR_TEAM_NAME",
+            "HOME_TEAM_NAME",
+            "GAME_DATE"
+        ]
+    ].to_dict("records")
 
 def add_team_info(game, teams):
     home_team_info = teams.loc[teams['nickname'] == game['HOME_TEAM_NAME'], ['id', 'year_founded']]
