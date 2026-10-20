@@ -571,42 +571,64 @@ season_id = get_nba_season_id(selected_date)
 
 if st.button("Get predictions"):
     try:
-        games = get_schedule(formatted_date,season_id)
+        st.write("1. A obter calendário...")
+        games = get_schedule(formatted_date, season_id)
+
         if games:
             for game in games:
-                game = add_team_info(game,pd_teams)
-                game = add_game_info(game,pd_games,pd_players,season_id,selected_date)
+                st.write(f"2. A processar jogo: {game}")
+
+                game = add_team_info(game, pd_teams)
+                st.write("3. Informação das equipas adicionada.")
+
+                game = add_game_info(
+                    game, pd_games, pd_players,
+                    season_id, selected_date
+                )
+                st.write("4. Informação do jogo adicionada.")
+
                 processed_data = process_input(game)
+                st.write("5. Dados preparados para o modelo.")
 
                 probabilities = model.predict_proba(processed_data)
-                home_team_win_probability = probabilities[0][1]
-                visitor_team_win_probability = probabilities[0][0]
+                st.write("6. Previsões calculadas.")
 
-                if(home_team_win_probability >= visitor_team_win_probability):
-                     winning_team = game['HOME_TEAM_NAME']
-                     probability = home_team_win_probability
+                home_prob = probabilities[0][1]
+                visitor_prob = probabilities[0][0]
+
+                if home_prob >= visitor_prob:
+                    winning_team = game['HOME_TEAM_NAME']
+                    probability = home_prob
                 else:
-                    winning_team =game['VISITOR_TEAM_NAME']
-                    probability = visitor_team_win_probability
+                    winning_team = game['VISITOR_TEAM_NAME']
+                    probability = visitor_prob
 
-                visitor_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['VISITOR_TEAM_NAME']}.png"
-                home_logo = f"{STREAMLIT_LOGOS_DIRECTORY}/{game['HOME_TEAM_NAME']}.png"
-                
+                visitor_logo = (
+                    f"{STREAMLIT_LOGOS_DIRECTORY}/"
+                    f"{game['VISITOR_TEAM_NAME']}.png"
+                )
+                home_logo = (
+                    f"{STREAMLIT_LOGOS_DIRECTORY}/"
+                    f"{game['HOME_TEAM_NAME']}.png"
+                )
+
                 display_team_matchup(
                     visitor_team_name=game['VISITOR_TEAM_NAME'],
                     home_team_name=game['HOME_TEAM_NAME'],
                     visitor_logo_url=visitor_logo,
                     home_logo_url=home_logo,
-                    prediction = winning_team,
-                    probability = probability,
-                    data = game
+                    prediction=winning_team,
+                    probability=probability,
+                    data=game
                 )
-                
         else:
             st.write("No games found for the chosen date")
+
     except Exception as e:
-        st.write(f"Something went wrong")
-        st.write(f"Error: {e}")
+        import traceback
+
+        st.error(f"Erro: {e}")
+        st.code(traceback.format_exc())
 
 # Adicionar o footer com as informações sobre as limitações do modelo de previsão
 footer_html = """
