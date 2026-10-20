@@ -4,10 +4,10 @@ import details
 import merge_headers_lines
 import players
 
-SEASON_BEGIN_DATE = '10/22/2024'
-START_DATE = '2024-10-22'
+SEASON_BEGIN_DATE = '10/20/2026'
+START_DATE = '2026-10-20
 END_DATE = utils.getPreviousDay()
-SEASON = '2024-25'
+SEASON = '2026-27'
 
 utils.clean_previous_data()
 print("Getting games headers")
