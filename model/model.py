@@ -28,16 +28,24 @@ def get_schedule(date, season_id=None):
         "schedule.xlsx"
     )
 
-    df = pd.read_excel(schedule_file_path)
+    if not os.path.isfile(schedule_file_path):
+        raise FileNotFoundError(
+            f"Não foi encontrado o ficheiro: {schedule_file_path}"
+        )
+
+    df = pd.read_excel(
+        schedule_file_path,
+        engine="openpyxl"
+    )
 
     df["GAME_DATE"] = pd.to_datetime(
         df["GAME_DATE"],
         errors="coerce"
-    ).dt.strftime("%m/%d/%Y")
+    ).dt.date
 
-    formatted_date = pd.to_datetime(date).strftime("%m/%d/%Y")
+    selected_date = pd.to_datetime(date).date()
 
-    games = df[df["GAME_DATE"] == formatted_date].copy()
+    games = df[df["GAME_DATE"] == selected_date]
 
     return games[
         [
